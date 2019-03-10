@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import './screens/button_screen.dart';
+import './screens/home_page.dart';
 
 final ThemeData iOSTheme = ThemeData(
   primarySwatch: Colors.red,
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: "Chat Application",
       theme:
           defaultTargetPlatform == TargetPlatform.iOS ? iOSTheme : androidTheme,
-      home: ButtonScreen(),
+      home: HomePage(),
     );
   }
 }

@@ -1,36 +1,84 @@
 import 'package:chat_application/main.dart';
 import 'package:chat_application/model/msg.dart';
+import 'package:chat_application/screens/home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../handleDB/db_management.dart';
 
 class Chat extends StatefulWidget {
   @override
+  Chat({
+    this.contactUid,
+    this.contactName,
+  });
+  final String contactUid;
+  final String contactName;
   State createState() => ChatWindow();
 }
 
 class ChatWindow extends State<Chat> with TickerProviderStateMixin {
-  final List<Msg> messages = <Msg>[];
+  // final List<Msg> messages = <Msg>[];
   final TextEditingController _textController = TextEditingController();
   bool _isWriting = false;
 
+  Stream<QuerySnapshot> messages;
+
   @override
   Widget build(BuildContext ctx) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Chat Application"),
-        elevation: Theme.of(ctx).platform == TargetPlatform.iOS ? 0.0 : 6.0,
-      ),
-      body: Column(children: <Widget>[
-        Flexible(
-          child: ListView.builder(
-            itemBuilder: (_, int index) => messages[index],
-            itemCount: messages.length,
-            reverse: true,
-            padding: EdgeInsets.all(16.0),
-          ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.contactName),
+          elevation: Theme.of(ctx).platform == TargetPlatform.iOS ? 0.0 : 6.0,
         ),
-        _buildComposer(),
-      ]),
+        body: Column(children: <Widget>[
+          Flexible(
+            child: _msgsList(),
+          ),
+          _buildComposer(),
+        ]),
+      ),
     );
+  }
+
+  Widget _msgsList() {
+    if (messages != null) {
+      return StreamBuilder<QuerySnapshot>(
+        stream: messages,
+        builder: (context, snapshot) {
+          return ListView.builder(
+            itemCount: snapshot.data.documents.length,
+            padding: EdgeInsets.all(16.0),
+            itemBuilder: (context, i) { 
+              return ListTile(
+                title: Text(
+                  snapshot.data.documents[i].data['message'],
+                  style: TextStyle(color: Colors.black),
+                ),
+                onTap: (){},
+                // onLongPress: DbManagement().deleteMessage(snapshot.data.documents[i].documentID),
+              );
+              // return Msg(
+              //   animationController: AnimationController(
+              //       vsync: this, duration: Duration(milliseconds: 200)),
+              //   txt: snapshot.data.documents[i].data['message'],
+              //   senderUid: snapshot.data.documents[i].data['userOneUid'],
+              // );
+            },
+          );
+        },
+      );
+    } else {
+      return Text("Loading, please wait...");
+    }
+  }
+
+  @override
+  void initState() {
+    messages = DbManagement()
+        .getMessagesBetween(DbManagement.user.uid, widget.contactUid);
+    super.initState();
   }
 
   Widget textField() {
@@ -41,7 +89,7 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
             border: Border.all(color: Colors.black12)),
-        child: Center( 
+        child: Center(
           child: TextField(
             controller: _textController,
             onChanged: (String txt) {
@@ -76,34 +124,41 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
           ),
         ],
       ),
-      // decoration: Theme.of(context).platform == TargetPlatform.iOS
-      //     ? BoxDecoration(
-      //         border: Border(top: BorderSide(color: Colors.brown)))
-      //     : null,
     );
   }
 
   void _submitMsg(String txt) {
+    FirebaseUser user = DbManagement.user;
     _textController.clear();
     setState(() {
       _isWriting = false;
     });
-    Msg msg = Msg(
-      txt: txt,
-      animationController: AnimationController(
-          vsync: this, duration: Duration(milliseconds: 200)),
-    );
-    setState(() {
-      messages.insert(0, msg);
+    Firestore.instance.collection('/messages').add({
+      // 'senderUid': user.uid,
+      'userOneUid': user.uid,
+      'userTwoUid': widget.contactUid,
+      'message': txt,
+      'date': DateTime.now(),
+    }).catchError((e) {
+      print(e);
     });
-    msg.animationController.forward();
+
+    // Msg msg = Msg(
+    //   txt: txt,
+    //   animationController: AnimationController(
+    //       vsync: this, duration: Duration(milliseconds: 200)),
+    // );
+    // setState(() {
+    //   messages.insert(0, msg);
+    // });
+    // msg.animationController.forward();
   }
 
-  @override
-  void dispose() {
-    for (Msg msg in messages) {
-      msg.animationController.dispose();
-    }
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   for (Msg msg in messages) {
+  //     msg.animationController.dispose();
+  //   }
+  //   super.dispose();
+  // }
 }
