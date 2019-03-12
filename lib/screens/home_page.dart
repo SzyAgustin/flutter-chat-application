@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   GoogleSignIn googleAuth = GoogleSignIn();
   String userName = "";
   bool signedIn = false;
+  bool isLoading = false;
   // String loggedIn = "Not logged in";
 
   Widget build(BuildContext context) {
@@ -73,13 +74,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget logedInName() {
-    if (signedIn) {
-      return Text(userName);
+    if (isLoading) {
+      return CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue));
     }
-    return Text("Not logged in");
+    if (!signedIn) {
+      return Text("Not logged in");
+    }
+    return Text(userName);
   }
 
   void signInWithGoogle() {
+    setState(() {
+      isLoading = true;
+    });
     googleAuth.signIn().then((result) {
       result.authentication.then((googleKey) {
         AuthCredential cred = GoogleAuthProvider.getCredential(
@@ -92,6 +100,7 @@ class _HomePageState extends State<HomePage> {
             DbManagement.user = signedInUser;
             userName = signedInUser.displayName;
             signedIn = true;
+            isLoading = false;
           });
         });
       }).catchError((e) {
