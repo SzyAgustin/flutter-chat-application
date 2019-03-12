@@ -50,21 +50,12 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
           return ListView.builder(
             itemCount: snapshot.data.documents.length,
             padding: EdgeInsets.all(16.0),
-            itemBuilder: (context, i) { 
-              return ListTile(
-                title: Text(
-                  snapshot.data.documents[i].data['message'],
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: (){},
-                // onLongPress: DbManagement().deleteMessage(snapshot.data.documents[i].documentID),
+            reverse: true,
+            itemBuilder: (context, i) {
+              return Msg(
+                txt: snapshot.data.documents[snapshot.data.documents.length-1-i].data['message'],
+                senderUid: snapshot.data.documents[snapshot.data.documents.length-1-i].data['senderUid'],
               );
-              // return Msg(
-              //   animationController: AnimationController(
-              //       vsync: this, duration: Duration(milliseconds: 200)),
-              //   txt: snapshot.data.documents[i].data['message'],
-              //   senderUid: snapshot.data.documents[i].data['userOneUid'],
-              // );
             },
           );
         },
@@ -135,8 +126,13 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
     });
     Firestore.instance.collection('/messages').add({
       // 'senderUid': user.uid,
-      'userOneUid': user.uid,
-      'userTwoUid': widget.contactUid,
+      'userOneUid': user.uid.hashCode < widget.contactUid.hashCode
+          ? user.uid
+          : widget.contactUid,
+      'userTwoUid': user.uid.hashCode < widget.contactUid.hashCode
+          ? widget.contactUid
+          : user.uid,
+      'senderUid': user.uid,
       'message': txt,
       'date': DateTime.now(),
     }).catchError((e) {

@@ -4,26 +4,24 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 
 class Msg extends StatelessWidget {
-  Msg({this.txt, this.animationController, this.senderUid});
+  Msg({this.txt, this.senderUid});
   final String txt;
   final senderUid;
-  final AnimationController animationController;
 
   @override
-  Widget build(BuildContext context) { 
-    return SizeTransition(
-      sizeFactor:
-          CurvedAnimation(parent: animationController, curve: Curves.easeOut),
-      axisAlignment: 0.0,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: senderUid != DbManagement.user.uid ? MainAxisAlignment.start : MainAxisAlignment.end,
-          children: <Widget>[
-            msg(context),
-          ],
-        ),
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Wrap(
+        spacing: 8.0, // gap between adjacent chips
+        runSpacing: 4.0, // gap between lines
+        direction: Axis.horizontal,
+        alignment: senderUid != DbManagement.user.uid
+            ? WrapAlignment.start
+            : WrapAlignment.end,
+        children: <Widget>[
+          msg(context),
+        ],
       ),
     );
   }
@@ -32,6 +30,14 @@ class Msg extends StatelessWidget {
     if (senderUid != DbManagement.user.uid) {
       return BoxDecoration(
         border: Border.all(color: Colors.blue[200]),
+        color: Colors.blue[50],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            offset: new Offset(3, 3),
+            blurRadius: 3,
+          ),
+        ],
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -41,6 +47,14 @@ class Msg extends StatelessWidget {
     } else {
       return BoxDecoration(
         border: Border.all(color: Colors.lightGreen[400]),
+        color: Colors.lightGreen[50],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            offset: new Offset(3, 3),
+            blurRadius: 3,
+          ),
+        ],
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(20),
           topLeft: Radius.circular(20),
@@ -52,12 +66,11 @@ class Msg extends StatelessWidget {
 
   Widget msg(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(5.0),
+      padding: EdgeInsets.only(top: 2.0, bottom: 2, right: 5, left: 5),
       decoration: boxDecorationBasedOnSender(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // senderName(),
           Container(
             margin: const EdgeInsets.all(5),
             child: Text(txt),
