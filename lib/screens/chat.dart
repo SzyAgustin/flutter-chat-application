@@ -52,9 +52,23 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
             padding: EdgeInsets.all(16.0),
             reverse: true,
             itemBuilder: (context, i) {
-              return Msg(
-                txt: snapshot.data.documents[snapshot.data.documents.length-1-i].data['message'],
-                senderUid: snapshot.data.documents[snapshot.data.documents.length-1-i].data['senderUid'],
+              return GestureDetector(
+                onLongPress: () {
+                  DbManagement().deleteMessage(snapshot
+                      .data
+                      .documents[snapshot.data.documents.length - 1 - i]
+                      .documentID);
+                },
+                child: Msg(
+                  txt: snapshot
+                      .data
+                      .documents[snapshot.data.documents.length - 1 - i]
+                      .data['message'],
+                  senderUid: snapshot
+                      .data
+                      .documents[snapshot.data.documents.length - 1 - i]
+                      .data['senderUid'],
+                ),
               );
             },
           );
