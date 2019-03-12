@@ -47,6 +47,11 @@ class ChatWindow extends State<Chat> with TickerProviderStateMixin {
       return StreamBuilder<QuerySnapshot>(
         stream: messages,
         builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)));
+          }
           return ListView.builder(
             itemCount: snapshot.data.documents.length,
             padding: EdgeInsets.all(16.0),

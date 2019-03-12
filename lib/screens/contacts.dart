@@ -46,28 +46,29 @@ class _ContactsState extends State<Contacts> {
   }
 
   Widget contactsList() {
-    if (contacts != null) {
-      return ListView.builder(
-        itemCount: contacts.documents.length,
-        padding: EdgeInsets.all(16.0),
-        itemBuilder: (_, int i) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue[200]),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            child: ListTile(
-              title: Text(contacts.documents[i].data['email']),
-              subtitle: Text(contacts.documents[i].data['uid']),
-              onTap: () => openChatWith(contacts.documents[i].data['uid'],
-                  contacts.documents[i].data['displayName']),
-            ),
-          );
-        },
-      );
-    } else {
-      return Text("Loading, please wait.. ");
+    if (contacts == null) {
+      return Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)));
     }
+    return ListView.builder(
+      itemCount: contacts.documents.length,
+      padding: EdgeInsets.all(16.0),
+      itemBuilder: (_, int i) {
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue[200]),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: ListTile(
+            title: Text(contacts.documents[i].data['email']),
+            subtitle: Text(contacts.documents[i].data['uid']),
+            onTap: () => openChatWith(contacts.documents[i].data['uid'],
+                contacts.documents[i].data['displayName']),
+          ),
+        );
+      },
+    );
   }
 
   @override
