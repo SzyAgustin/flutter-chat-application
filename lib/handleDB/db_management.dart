@@ -1,9 +1,13 @@
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+
 
 class DbManagement {
   static FirebaseUser user;
+  // static FirebaseMessaging;
+  // static FirebaseMessaging msg = FirebaseMessaging();
 
   getMessagesBetween(String uidOne, String uidTwo) {
     Stream<QuerySnapshot> messages = Firestore.instance

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../handleDB/db_management.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // Google sign in
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   String userName = "";
   bool signedIn = false;
   bool isLoading = false;
+  FirebaseMessaging _messaging =FirebaseMessaging();
   // String loggedIn = "Not logged in";
 
   Widget build(BuildContext context) {
@@ -53,6 +55,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _messaging.getToken().then((token){
+      print('token is: $token');
+    });
   }
 
   void goToContacts() {
