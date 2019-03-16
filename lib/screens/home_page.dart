@@ -64,6 +64,18 @@ class _HomePageState extends State<HomePage> {
     _messaging.getToken().then((token){
       print('token is: $token');
     });
+
+     _messaging.configure(
+    onMessage: (Map<String, dynamic> message) async {
+      print('on message $message');
+    },
+    onResume: (Map<String, dynamic> message) async {
+      print('on resume $message');
+    },
+    onLaunch: (Map<String, dynamic> message) async {
+      print('on launch $message');
+    },
+  );
   }
 
   void goToContacts() {
