@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   String userName = "";
   bool signedIn = false;
   bool isLoading = false;
-  FirebaseMessaging _messaging =FirebaseMessaging();
+  FirebaseMessaging _messaging = FirebaseMessaging();
   // String loggedIn = "Not logged in";
 
   Widget build(BuildContext context) {
@@ -60,22 +60,26 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    _messaging.getToken().then((token){
-      print('token is: $token');
-    });
-
-     _messaging.configure(
-    onMessage: (Map<String, dynamic> message) async {
-      print('on message $message');
-    },
-    onResume: (Map<String, dynamic> message) async {
-      print('on resume $message');
-    },
-    onLaunch: (Map<String, dynamic> message) async {
-      print('on launch $message');
-    },
-  );
+    _messaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('on message $message');
+        print(message);
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('SGASDFGSDFGSDFGSDFHBSDFHBSFDGHBSFGHBDSGFBFX');
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) => Chat(
+        //             contactUid: message,
+        //             contactName: nameOfContact,
+        //           )),
+        // );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('on launch $message');
+      },
+    );
   }
 
   void goToContacts() {
@@ -141,9 +145,13 @@ class _HomePageState extends State<HomePage> {
         .getDocuments()
         .then((docs) {
       if (docs.documents.length > 0) {
-        Firestore.instance
-            .document('/users/${docs.documents[0].documentID}')
-            .updateData({'photoUrl': signedInUser.photoUrl});
+        _messaging.getToken().then((token) {
+          Firestore.instance
+              .document('/users/${docs.documents[0].documentID}')
+              .updateData(
+                  {'photoUrl': signedInUser.photoUrl, 'tokenId': token});
+        });
+
         return;
       }
       Firestore.instance.collection('/users').add({
