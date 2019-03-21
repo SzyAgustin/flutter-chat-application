@@ -21,6 +21,7 @@ dependencies:
   cloud_firestore:
   google_sign_in:
   firebase_messaging: 
+  image_picker:
   flutter:
     sdk: flutter
 

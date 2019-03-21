@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext ctx) {
     return MaterialApp(
       title: "Chat Application",
-      theme:
-          defaultTargetPlatform == TargetPlatform.iOS ? iOSTheme : androidTheme,
+      // theme:
+      //     defaultTargetPlatform == TargetPlatform.iOS ? iOSTheme : androidTheme,
       home: HomePage(),
     );
   }

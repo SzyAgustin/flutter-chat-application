@@ -68,6 +68,7 @@ class Msg extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(top: 2.0, bottom: 2, right: 5, left: 5),
       decoration: boxDecorationBasedOnSender(),
+      constraints: BoxConstraints(maxWidth: 250),//should be a percentage of the layout
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

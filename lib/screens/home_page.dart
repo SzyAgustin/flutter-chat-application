@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              logedInName(),
+              photoAndName(),
               MaterialButton(
                 disabledTextColor: Colors.black, //not working????
                 disabledColor: Colors.grey,
@@ -55,6 +55,41 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget photoAndName() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          circlePhoto(),
+          logedInName(),
+        ],
+      ),
+    );
+  }
+
+  Widget circlePhoto() {
+    if (!signedIn){
+      return Text("");//should not be this!!!!!
+    }
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.purple,
+          width: 2,
+        ),
+      ),
+      width: 120,
+      height: 120,
+      child: ClipOval(
+        child: FittedBox(child: photo()),
+      ),
+    );
+  }
+
+  Widget photo() {
+    return Image.network(DbManagement.user.photoUrl);
   }
 
   @override
@@ -106,9 +141,9 @@ class _HomePageState extends State<HomePage> {
           valueColor: AlwaysStoppedAnimation<Color>(Colors.blue));
     }
     if (!signedIn) {
-      return Text("Not logged in");
+      return Text("Please, log in");
     }
-    return Text(userName);
+    return Text(userName, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),);
   }
 
   void signInWithGoogle() {
