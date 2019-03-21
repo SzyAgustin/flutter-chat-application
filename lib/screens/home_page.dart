@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_application/screens/chat.dart';
 import 'package:chat_application/screens/contacts.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../handleDB/db_management.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 // Google sign in
 import 'package:google_sign_in/google_sign_in.dart';
@@ -68,22 +72,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void pickPhoto() async {
+    var tempPhoto = await ImagePicker.pickImage(source: ImageSource.gallery);
+    FirebaseStorage.instance.ref().child(DbManagement.user.uid + '-profilePhoto.jpg').putFile(tempPhoto);
+
+  }
+
+
+
   Widget circlePhoto() {
-    if (!signedIn){
-      return Text("");//should not be this!!!!!
+    if (!signedIn) {
+      return Text(""); //should not be this!!!!!
     }
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.purple,
-          width: 2,
+    return GestureDetector(
+      onTap: pickPhoto,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.purple,
+            width: 2,
+          ),
         ),
-      ),
-      width: 120,
-      height: 120,
-      child: ClipOval(
-        child: FittedBox(child: photo()),
+        width: 120,
+        height: 120,
+        child: ClipOval(
+          child: FittedBox(child: photo()),
+        ),
       ),
     );
   }
@@ -143,7 +158,10 @@ class _HomePageState extends State<HomePage> {
     if (!signedIn) {
       return Text("Please, log in");
     }
-    return Text(userName, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),);
+    return Text(
+      userName,
+      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+    );
   }
 
   void signInWithGoogle() {
