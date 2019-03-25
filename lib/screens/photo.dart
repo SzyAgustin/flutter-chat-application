@@ -14,13 +14,16 @@ class PhotoView extends StatelessWidget {
           child: Stack(
         alignment: AlignmentDirectional.bottomCenter,
         children: <Widget>[
-          photo,
+          Container(
+            height: 500,
+            child: photo,
+          ),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              height: 30,
+              height: 120,
               child: changePhotoButton(),
             ),
           ),
@@ -40,7 +43,6 @@ class PhotoView extends StatelessWidget {
     final StorageUploadTask task = ref.putFile(tempPhoto);
     final downloadUrl = await (await task.onComplete).ref.getDownloadURL();
     DbManagement().updateUrlImageToUser(downloadUrl);
-        
   }
 
   Widget changePhotoButton() {
@@ -53,7 +55,10 @@ class PhotoView extends StatelessWidget {
           child: Center(
             child: Text(
               "Change Picture",
-              style: TextStyle(color: Colors.white, fontSize: 4, decoration: TextDecoration.none),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  decoration: TextDecoration.none),
             ),
           ),
         ),
