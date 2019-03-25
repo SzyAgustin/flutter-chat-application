@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chat_application/screens/chat.dart';
 import 'package:chat_application/screens/contacts.dart';
+import 'package:chat_application/screens/photo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   bool signedIn = false;
   bool isLoading = false;
   FirebaseMessaging _messaging = FirebaseMessaging();
+  Image _image;
   // String loggedIn = "Not logged in";
 
   Widget build(BuildContext context) {
@@ -72,20 +74,21 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void pickPhoto() async {
-    var tempPhoto = await ImagePicker.pickImage(source: ImageSource.gallery);
-    FirebaseStorage.instance.ref().child(DbManagement.user.uid + '-profilePhoto.jpg').putFile(tempPhoto);
-
+  void goToPhotoView() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PhotoView(
+                  photo: _image,
+                )));
   }
-
-
 
   Widget circlePhoto() {
     if (!signedIn) {
       return Text(""); //should not be this!!!!!
     }
     return GestureDetector(
-      onTap: pickPhoto,
+      onTap: goToPhotoView,
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -97,19 +100,16 @@ class _HomePageState extends State<HomePage> {
         width: 120,
         height: 120,
         child: ClipOval(
-          child: FittedBox(child: photo()),
+          child: FittedBox(child: _image),
         ),
       ),
     );
   }
 
-  Widget photo() {
-    return Image.network(DbManagement.user.photoUrl);
-  }
-
   @override
   void initState() {
     super.initState();
+
     _messaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('on message $message');
@@ -175,12 +175,17 @@ class _HomePageState extends State<HomePage> {
           accessToken: googleKey.accessToken,
         );
         FirebaseAuth.instance.signInWithCredential(cred).then((signedInUser) {
-          storeUser(signedInUser);
+          DbManagement().storeUser(signedInUser, _messaging);
           setState(() {
             DbManagement.user = signedInUser;
             userName = signedInUser.displayName;
             signedIn = true;
             isLoading = false;
+          });
+          DbManagement().getImageFromUser().then((im) {
+            setState(() {
+             _image = im; 
+            });
           });
         });
       }).catchError((e) {
@@ -188,31 +193,6 @@ class _HomePageState extends State<HomePage> {
       });
     }).catchError((e) {
       print(e);
-    });
-  }
-
-  void storeUser(FirebaseUser signedInUser) {
-    Firestore.instance
-        .collection('/users')
-        .where('uid', isEqualTo: signedInUser.uid)
-        .getDocuments()
-        .then((docs) {
-      if (docs.documents.length > 0) {
-        _messaging.getToken().then((token) {
-          Firestore.instance
-              .document('/users/${docs.documents[0].documentID}')
-              .updateData(
-                  {'photoUrl': signedInUser.photoUrl, 'tokenId': token});
-        });
-
-        return;
-      }
-      Firestore.instance.collection('/users').add({
-        'email': signedInUser.email,
-        'uid': signedInUser.uid,
-        'photoUrl': signedInUser.photoUrl,
-        'displayName': signedInUser.displayName,
-      });
     });
   }
 }
