@@ -27,7 +27,8 @@ class _HomePageState extends State<HomePage> {
   bool signedIn = false;
   bool isLoading = false;
   FirebaseMessaging _messaging = FirebaseMessaging();
-  Image _image;
+  Stream<Image> photoStream;
+  Image photo;
   // String loggedIn = "Not logged in";
 
   Widget build(BuildContext context) {
@@ -75,12 +76,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void goToPhotoView() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PhotoView(
-                  photo: _image,
-                )));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => PhotoView(photo: photo)));
   }
 
   Widget circlePhoto() {
@@ -100,7 +97,18 @@ class _HomePageState extends State<HomePage> {
         width: 120,
         height: 120,
         child: ClipOval(
-          child: FittedBox(child: _image),
+          child: FittedBox(
+            child: StreamBuilder<Image>(
+                stream: photoStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue));
+                  }
+                  photo = snapshot.data;
+                  return snapshot.data;
+                }),
+          ),
         ),
       ),
     );
@@ -182,10 +190,8 @@ class _HomePageState extends State<HomePage> {
             signedIn = true;
             isLoading = false;
           });
-          DbManagement().getImageFromUser().then((im) {
-            setState(() {
-             _image = im; 
-            });
+          setState(() {
+            photoStream = DbManagement().getStoredPhotoStream();
           });
         });
       }).catchError((e) {

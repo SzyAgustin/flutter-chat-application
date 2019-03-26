@@ -22,6 +22,14 @@ class DbManagement {
     return messages;
   }
 
+  getStoredPhotoStream(){
+    return Firestore.instance
+        .collection('/users')
+        .where('uid',
+            isEqualTo: user.uid)
+        .snapshots().map((snap) => Image.network(snap.documents[0].data['photoUrl']));
+  }
+
   deleteMessage(id) {
     Firestore.instance
         .collection('/messages')
